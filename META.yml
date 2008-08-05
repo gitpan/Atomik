@@ -1,0 +1,29 @@
+---
+abstract: 'An Atom/AtomPub Framework'
+author:
+  - 'Daisuke Maki C<< <daisuke@endeworks.jp> >>'
+build_requires:
+  Test::Moose: 0
+  Test::More: 0
+  Test::UseAllModules: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Atomik
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DateTime: 0
+  Digest::SHA1: 0
+  LWP::UserAgent: 0
+  MIME::Base64: 0
+  Moose: 0
+  XML::LibXML: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.00001
