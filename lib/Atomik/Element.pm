@@ -1,26 +1,38 @@
-# $Id: /mirror/coderepos/lang/perl/Atomik/trunk/lib/Atomik/Element.pm 67838 2008-08-05T05:08:34.471338Z daisuke  $
+# $Id: /mirror/coderepos/lang/perl/Atomik/trunk/lib/Atomik/Element.pm 68160 2008-08-10T23:55:31.147997Z daisuke  $
 
 package Atomik::Element;
 use Moose;
 
-has 'storage' => (
-    is => 'rw',
-    does => 'Atomik::Storage',
-);
+has 'storage' => ( is => 'rw', does => 'Atomik::Storage' );
 
 has 'namespace' => (
-    is => 'ro',
+    is => 'rw',
     isa => 'Str',
-    required => 1,
 );
 
 has 'version' => (
-    is => 'ro',
+    is => 'rw',
     isa => 'Num',
-    required => 1,
 );
 
 no Moose;
+
+my %NS2VERSION = (
+    "http://purl.org/atom/ns#" => '0.3',
+    "http://www.w3.org/2005/Atom" => '1.0',
+    "http://www.w3.org/2007/app" => '1.0', # AtomPub
+);
+
+sub BUILD {
+    my $self = shift;
+
+    if (my $node = $self->node) {
+        my $namespace = $node->namespaceURI();
+        $self->namespace( $namespace );
+        $self->version( $NS2VERSION{ $namespace } );
+    }
+    return $self;
+}
 
 sub from_any {
     my ($class, $any) = @_;

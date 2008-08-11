@@ -1,4 +1,4 @@
-# $Id: /mirror/coderepos/lang/perl/Atomik/trunk/lib/Atomik/Client.pm 67843 2008-08-05T05:55:30.094900Z daisuke  $
+# $Id: /mirror/coderepos/lang/perl/Atomik/trunk/lib/Atomik/Client.pm 68152 2008-08-10T22:25:14.315235Z daisuke  $
 
 package Atomik::Client;
 use Moose;
@@ -7,25 +7,13 @@ use Atomik::Client::RequestFactory;
 use Atomik::Entry;
 use Atomik::MediaType;
 use Atomik::Service;
-use DateTime;
-use Digest::SHA1();
+use Atomik::WSSE;
 use LWP::UserAgent;
-use MIME::Base64();
 
-has 'username' => (
+has 'wsse' => (
     is => 'rw',
-    isa => 'Str'
-);
-
-has 'password' => (
-    is => 'rw',
-    isa => 'Str'
-);
-
-has 'use_wsse' => (
-    is => 'rw',
-    isa => 'Bool',
-    default => 1
+    isa => 'Atomik::WSSE',
+    coerce => 1,
 );
 
 has 'debug' => (
@@ -64,15 +52,6 @@ __PACKAGE__->meta->make_immutable;
 
 no Moose;
 
-BEGIN
-{
-    if ($ENV{ ATOMIK_DEBUG }) {
-        *DEBUG = sub { print STDERR "@_\n" }
-    } else {
-        *DEBUG = sub {};
-    }
-}
-
 # We auto-generate these methods, cause they are... the same.
 BEGIN
 {
@@ -87,7 +66,7 @@ BEGIN
                 my $request = $self->request_create(%%args);
                 my $response = $self->send_request( request => $request );
 
-                DEBUG( $response->as_string );
+                Atomik::DEBUG( $response->as_string );
 
                 if ( ! $response->is_success ) {
                     confess "Request to $uri failed: " . $response->as_string;
@@ -138,7 +117,7 @@ sub entry_create {
         confess "Request to $uri failed: " . $response->as_string;
     }
 
-    DEBUG( $response->as_string );
+    Atomik::DEBUG( $response->as_string );
 
     if (wantarray) {
         return ( $response->header('Location'), Atomik::Entry->from_xml( $response->content ) );
@@ -215,24 +194,11 @@ sub entry_delete {
     return 1;
 }
 
-sub nonce {
-    Digest::SHA1::sha1( Digest::SHA1::sha1(time(), {}, rand(), $$) )
-}
-
 sub send_request {
     my ($self, %args) = @_;
     my $request = $args{request};
-    if ($self->use_wsse) {
-        my $nonce   = $self->nonce;
-        my $encoded = MIME::Base64::encode_base64($nonce, '');
-        my $now     = DateTime->now(time_zone => 'UTC')->iso8601;
-        my $digest  = MIME::Base64::encode_base64(
-            Digest::SHA1::sha1($nonce, $now, $self->password || ''), ''
-        );
-        $request->header('X-WSSE', sprintf
-          qq(UsernameToken Username="%s", PasswordDigest="%s", Nonce="%s", Created="%s"),
-          $self->username || '', $digest, $encoded, $now);
-        $request->header('Authorization', 'WSSE profile="UsernameToken"');
+    if (my $wsse = $self->wsse) {
+        $wsse->set_headers( $request );
     }
 
     if ($self->debug) {
@@ -275,5 +241,16 @@ Atomik::Client - An Atompub Client
   # you can receive an Atomik::Entry, if you get the result in
   # list context
   my ($entry_uri, $entry) = $client->entry_create(...);
+
+=head1 METHODS
+
+=head2 new(%args)
+
+  Atomik::Client->new(
+    wsse => {
+      username => $username,
+      
+    [ wsse_username => 
+    [ use_wsse => $bool ]
 
 =cut

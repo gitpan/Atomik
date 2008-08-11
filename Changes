@@ -1,5 +1,9 @@
 Changes
 =======
 
-0.00001 - 05 Aug 2008
-  - Initial release
+0.00001_02 - 11 Aug 2008
+  * Depend on MooseX::DOM for xml access, therefore reducing the number of
+    modules in this distro significantly
+
+0.00001_01 - 05 Aug 2008
+  * Initial release

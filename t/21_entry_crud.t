@@ -32,7 +32,7 @@ EOXML
 
     ok($entry_uri);
     ok($entry);
-    isa_ok($entry, &Atomik::HAVE_LIBXML ? "Atomik::LibXML::Entry" : "Hoge");
+    isa_ok($entry, "Atomik::Entry");
 
     my ($edit) = grep { ($_->rel || '') eq 'edit' } $entry->links;
     ok( $edit );
@@ -41,7 +41,7 @@ EOXML
     my $got_entry = $client->entry_get( uri => $entry_uri );
 
     ok( $got_entry, "Accessed entry $entry_uri" );
-    isa_ok($entry, &Atomik::HAVE_LIBXML ? "Atomik::LibXML::Entry" : "Hoge");
+    isa_ok($entry, "Atomik::Entry");
 
     $entry->content( "New text" );
 

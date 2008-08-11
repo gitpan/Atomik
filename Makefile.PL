@@ -10,7 +10,7 @@ requires 'DateTime';
 requires 'Digest::SHA1';
 requires 'LWP::UserAgent';
 requires 'MIME::Base64';
-requires 'XML::LibXML';
+requires 'MooseX::DOM', '0.00003';
 
 test_requires('Test::UseAllModules');
 test_requires('Test::More');

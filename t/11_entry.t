@@ -20,7 +20,7 @@ BEGIN
 EOXML
 
     ok($entry);
-    does_ok($entry, 'Atomik::Entry');
-    isa_ok($entry, &Atomik::HAVE_LIBXML ? 'Atomik::LibXML::Entry' : 'Atomik::Hoge');
+    isa_ok($entry, 'Atomik::Entry');
     is( $entry->title, "Atom-Powered Robots Run Amok" );
+    is( $entry->content->data, "Some text.");
 }

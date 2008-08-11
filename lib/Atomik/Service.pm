@@ -1,24 +1,21 @@
-# $Id: /mirror/coderepos/lang/perl/Atomik/trunk/lib/Atomik/Service.pm 67814 2008-08-05T03:10:41.547446Z daisuke  $
+# $Id: /mirror/coderepos/lang/perl/Atomik/trunk/lib/Atomik/Service.pm 68155 2008-08-10T23:43:48.443812Z daisuke  $
 
 package Atomik::Service;
-use Moose::Role;
-use Atomik;
+use Moose;
+use MooseX::DOM;
+use Atomik::Workspace;
+
+extends 'Atomik::Element';
+
+has_dom_children 'workspaces' => (
+    tag => 'workspace',
+    filter => sub {
+        my $self = shift;
+        return map { Atomik::Workspace->new(node => $_) } @_;
+    }
+);
 
 no Moose;
-
-foreach my $type qw(file xml string any) {
-    my $code = sprintf( <<'EOSUB', $type, $type );
-        sub from_%s {
-            my $class = shift;
-            if (&Atomik::HAVE_LIBXML) {
-                return Atomik::LibXML::Service->from_%s( @_ );
-            } else {
-                confess "not implemented";
-            }
-        }
-EOSUB
-    eval $code;
-    confess $@ if $@;
-}
+no MooseX::DOM;
 
 1;

@@ -1,16 +1,18 @@
-# $Id: /mirror/coderepos/lang/perl/Atomik/trunk/lib/Atomik.pm 67844 2008-08-05T05:59:28.733654Z daisuke  $
+# $Id: /mirror/coderepos/lang/perl/Atomik/trunk/lib/Atomik.pm 68160 2008-08-10T23:55:31.147997Z daisuke  $
 
 package Atomik;
 use strict;
-use constant HAVE_LIBXML => eval { require XML::LibXML; 1 } || 0;
+use Atomik::Client;
+use Atomik::Feed;
+
 our $VERSION = '0.00001';
 
 BEGIN
 {
-    if (HAVE_LIBXML) {
-        require Atomik::LibXML::Entry;
-        require Atomik::LibXML::Feed;
-        require Atomik::LibXML::Service;
+    if ($ENV{ ATOMIK_DEBUG }) {
+        *DEBUG = sub { print STDERR "@_\n" }
+    } else {
+        *DEBUG = sub {};
     }
 }
 
@@ -31,8 +33,10 @@ Atomik - An Atom/AtomPub Framework
   use Atomik::Client;
 
   my $client = Atomik::Client->new(
-    username => ...,
-    password => ...
+    wsse => { # if you require WSSE authentication
+      username => ...,
+      password => ...
+    }
   );
 
   my $service = $client->service_get( uri => $service_uri );

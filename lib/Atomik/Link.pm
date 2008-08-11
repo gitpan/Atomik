@@ -1,24 +1,18 @@
-# $Id: /mirror/coderepos/lang/perl/Atomik/trunk/lib/Atomik/Link.pm 67838 2008-08-05T05:08:34.471338Z daisuke  $
+# $Id: /mirror/coderepos/lang/perl/Atomik/trunk/lib/Atomik/Link.pm 68153 2008-08-10T22:30:30.128940Z daisuke  $
 
 package Atomik::Link;
-use Moose::Role;
-our $AUTOLOAD;
+use Moose;
+use MooseX::DOM;
+
+has_dom_root 'link';
+has_dom_attr 'href';
+has_dom_attr 'hreflang';
+has_dom_attr 'length';
+has_dom_attr 'rel';
+has_dom_attr 'title';
+has_dom_attr 'type';
 
 no Moose;
-
-sub AUTOLOAD {
-    my ($class, @args) = @_;
-
-    if ($class ne 'Atomik::Link') {
-        confess "No such method $AUTOLOAD";
-    }
-
-    my $method = $AUTOLOAD;
-    if (&Atomik::HAVE_LIBXML) {
-        $method =~ s/^.*:://;
-        return Atomik::LibXML::Link->$method(@args);
-    }
-}
-
+no MooseX::DOM;
 
 1;

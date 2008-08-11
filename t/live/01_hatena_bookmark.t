@@ -13,8 +13,10 @@ BEGIN
 }
 
 my $client = Atomik::Client->new(
-    username => $ENV{HB_USERNAME},
-    password => $ENV{HB_PASSWORD},
+    wsse => {
+        username => $ENV{HB_USERNAME},
+        password => $ENV{HB_PASSWORD},
+    },
     debug    => $ENV{ATOMIK_DEBUG},
 );
 $client->user_agent->timeout(60);
